@@ -1,0 +1,1745 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<link rel="icon" href="data:,">
+<title>家庭找物 · 实拍导览</title>
+<style>
+:root {
+  --paper:#faf8f4; --sheet:#fffdf9; --ink:#262421; --muted:#6e685f;
+  --line:#e2d8c7; --amber:#8a6116; --amber-soft:#f6ebd2; --amber-light:#fdf4df;
+  --shadow:0 1px 2px #4937210c,0 8px 25px #4937210b;
+  --serif:"Songti SC","Noto Serif CJK SC","STSong","SimSun",Georgia,serif;
+  --sans:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  --motion:cubic-bezier(.22,1,.36,1);
+}
+* { box-sizing:border-box }
+html { -webkit-text-size-adjust:100%; color-scheme:light }
+body {
+  margin:0; color:var(--ink); font:16px/1.6 var(--sans);
+  background-color:var(--paper);
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,#f2c45a1c,transparent 70%),
+    linear-gradient(#2624210a 1px,transparent 1px),linear-gradient(90deg,#2624210a 1px,transparent 1px);
+  background-size:auto,32px 32px,32px 32px;
+}
+body:has(dialog[open]) { overflow:hidden }
+button { color:inherit; font:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent }
+button:focus-visible { outline:2px solid #945c0c; outline-offset:3px }
+button[hidden], [hidden] { display:none !important }
+.wrap { width:min(1160px, calc(100% - 56px)); margin:auto }
+.masthead {
+  min-height:74px; display:flex; align-items:center; justify-content:space-between; gap:16px;
+  border-bottom:1px solid var(--line);
+}
+.brand { display:flex; align-items:center; gap:12px }
+.brand-mark { width:36px; height:36px; display:grid; place-items:center; border:1px solid #decdb1; border-radius:9px; background:#fbf0d9; color:var(--amber); flex:none }
+.brand-name { font:800 28px/1.1 var(--serif); letter-spacing:.045em }
+.brand-context { padding-left:14px; margin-left:4px; border-left:1px solid var(--line); color:var(--muted); font-size:13px }
+.outline,.primary,.back {
+  display:inline-flex; min-height:46px; align-items:center; justify-content:center; gap:9px;
+  border-radius:8px; padding:9px 14px; font-size:14px; font-weight:650;
+}
+.outline,.back { border:1px solid #ded1bb; background:var(--sheet) }
+.outline:hover,.back:hover { background:var(--amber-light) }
+.outline svg,.primary svg,.back svg { width:17px; height:17px; flex:none }
+.primary { background:var(--amber); color:#fffdf8; border:1px solid #805915; padding-inline:19px }
+.primary:hover { background:#735010 }
+.back { color:var(--muted) }
+.nav { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:18px 0 }
+.nav button {
+  display:flex; align-items:center; min-width:0; text-align:left; gap:12px; min-height:64px;
+  padding:9px 14px; border:1px solid var(--line); border-radius:9px; background:var(--sheet);
+}
+.nav button:hover { border-color:#c5ad83 }
+.nav button[aria-selected="true"] { background:var(--amber-soft); border-color:#cbb487; box-shadow:inset 0 0 0 1px #ad8c511a }
+.nav-no { display:grid; place-items:center; width:29px; height:29px; flex:none; border:1px solid #dfd0b5; border-radius:6px; background:#fff9ee; color:var(--amber); font:700 13px/1 Georgia,serif }
+.nav button[aria-selected="true"] .nav-no { border-color:var(--amber); background:var(--amber); color:white }
+.nav-name { display:block; font-size:16px; font-weight:750; line-height:1.3 }
+.nav-place { display:block; color:var(--muted); font-size:12px; margin-top:2px }
+.viewer {
+  display:grid; grid-template-columns:minmax(0, .96fr) minmax(0, 1.04fr);
+  background:var(--sheet); border:1px solid var(--line); border-radius:10px 14px 14px 10px;
+  box-shadow:var(--shadow),inset 11px 0 0 -10px #d4c6ae62; overflow:hidden;
+}
+.details { min-width:0; padding:28px 30px 24px; display:flex; flex-direction:column }
+h1,h2,p,figure { margin:0 }
+.summary-head { display:flex; align-items:center; justify-content:space-between; gap:9px }
+.summary-head h1 { min-width:0 }
+.quick-view { flex:none; margin-bottom:10px; color:#62440e; border-color:#d2b982; background:#fbf2df }
+.quick-view svg { width:16px; height:16px }
+h1 { font:800 clamp(34px,3.8vw,52px)/1.16 var(--serif); letter-spacing:.015em; margin-bottom:12px }
+.quick-location { display:flex; align-items:flex-start; gap:7px; font-size:16px; color:#62440e; font-weight:720; margin-bottom:6px }
+.quick-location svg { flex:none; width:17px; height:20px; margin-top:3px }
+.recorded { color:var(--muted); font-size:12px }
+.steps { list-style:none; margin:20px 0; padding:0; display:grid; gap:0; border-top:1px solid var(--line); border-bottom:1px solid var(--line) }
+.steps li+li { border-top:1px solid #eee6d8 }
+.steps button {
+  display:flex; align-items:center; text-align:left; gap:10px; width:100%; border:0;
+  padding:8px 9px; min-height:44px; background:transparent; font-size:14px; color:var(--muted);
+}
+.steps button:hover { background:#fbf6ea }
+.steps button[aria-current="step"] { color:#62440e; background:#fbf0d9; font-weight:730 }
+.step-no { width:25px; height:25px; border:1px solid #e2d4bc; border-radius:50%; background:#fff9ee; color:var(--amber); display:grid; place-items:center; flex:none; font:700 13px/1 Georgia,serif }
+.steps button[aria-current="step"] .step-no { background:var(--amber); border-color:var(--amber); color:white }
+.step-label { flex:1 }
+.step-arrow { color:var(--amber); width:14px; height:14px; visibility:hidden }
+.steps button[aria-current="step"] .step-arrow { visibility:visible }
+.instruction { padding-bottom:18px }
+.instruction h2 { font:760 23px/1.3 var(--serif); margin-bottom:7px }
+.instruction p { color:#514a3e; font-size:15px; line-height:1.75 }
+.actions { display:flex; gap:9px; margin-top:auto; padding-top:6px }
+.actions .primary { flex:1 }
+.stage {
+  position:relative; min-width:0; display:flex; flex-direction:column; justify-content:center; align-items:center;
+  padding:18px 20px 13px; border-left:1px solid var(--line);
+  background:#f8f2e7; background-image:radial-gradient(ellipse at 48% 0%,#fff9ed 0%,transparent 76%);
+}
+.photo {
+  position:relative; width:auto; max-width:100%; height:clamp(385px,61vh,610px);
+  aspect-ratio:676/1200; border-radius:9px; overflow:hidden;
+  background:#d6cabc; box-shadow:0 1px 6px #4d382740,0 12px 35px #50341614;
+}
+.photo img { display:block; width:100%; height:100%; object-fit:fill; }
+.frame-in { animation:frame-in 330ms var(--motion) both }
+@keyframes frame-in { from { opacity:.46; transform:scale(1.018) } to { opacity:1; transform:scale(1) } }
+.pointer { position:absolute; inset:0; width:100%; height:100%; pointer-events:none }
+.pointer-shadow { stroke:#352512ad; stroke-width:3.5; stroke-linecap:round }
+.pointer-line { stroke:#fff0ca; stroke-width:1.5; stroke-linecap:round }
+.pointer-tip { fill:#ffe5a4; stroke:#684711; stroke-width:1.2 }
+.stage-zoom { position:absolute; top:11px; right:11px; color:#684711; background:var(--sheet); box-shadow:0 2px 9px #291d1716 }
+.hotspot {
+  position:absolute; left:clamp(28px,var(--x),calc(100% - 28px)); top:clamp(28px,var(--y),calc(100% - 28px)); transform:translate(-50%,-50%);
+  display:grid; place-items:center; width:56px; height:56px; padding:0;
+  color:white; border:0; background:transparent; border-radius:50%;
+  filter:drop-shadow(0 1px 3px #21190dd4);
+}
+.hotspot::before,.hotspot::after { content:""; position:absolute; inset:6px; border-radius:50%; border:2px solid #fff4d7 }
+.hotspot::after { inset:1px; border:1px solid #ffe1a0; opacity:.8 }
+.hotspot svg { width:21px; height:21px; background:#684711dc; border-radius:50%; padding:3px }
+.hotspot:hover::before { background:#d7a13a38 }
+.hotspot:focus-visible { outline-color:white }
+figcaption { display:flex; justify-content:space-between; gap:16px; width:100%; padding-top:10px; color:var(--muted); font-size:12px; max-width:440px }
+figcaption .stamp { font-variant-numeric:tabular-nums; color:#634b22 }
+.footer { padding:12px 0 18px; font-size:12px; color:var(--muted) }
+dialog {
+  position:fixed; inset:0 0 0 auto; width:min(460px, 100vw); height:100dvh; max-width:none; max-height:none;
+  margin:0; padding:0; overflow:auto; background:var(--sheet); color:var(--ink);
+  border:1px solid var(--line); border-radius:12px 0 0 12px; box-shadow:-16px 0 55px #271d1a32;
+}
+dialog[open] { animation:drawer-in 280ms var(--motion) both }
+dialog::backdrop { background:#21191154 }
+@keyframes drawer-in { from { transform:translateX(100%) } to { transform:translateX(0) } }
+.proof-inner { padding:22px 24px 28px }
+.proof-head { display:flex; justify-content:space-between; align-items:center; gap:10px; border-bottom:1px solid var(--line); padding-bottom:11px }
+.proof-head h2 { font:800 29px/1.2 var(--serif) }
+.icon-btn { display:grid; place-items:center; width:44px; height:44px; flex:none; background:transparent; border:1px solid var(--line); border-radius:8px }
+.icon-btn:hover { background:var(--amber-light) }
+.proof-path { margin:14px 0 5px; color:#62440e; font-size:14px; font-weight:700 }
+.proof-meta { color:var(--muted); font-size:12px; margin-bottom:13px }
+.proof-tabs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin-bottom:12px }
+.proof-tabs button { min-height:44px; border:1px solid var(--line); border-radius:7px; background:var(--sheet); font:650 13px var(--sans) }
+.proof-tabs button[aria-pressed="true"] { background:var(--amber-soft); border-color:#cbb487; color:#62440e }
+.proof-frame { display:block; max-width:100%; max-height:55dvh; width:auto; height:auto; margin:auto; border-radius:8px; border:1px solid var(--line) }
+.proof-caption { color:var(--muted); font-size:13px; margin:9px 0 0 }
+@media (max-width:720px) {
+  .wrap { width:calc(100% - 24px) }
+  .masthead { min-height:56px; gap:8px }
+  .brand { gap:8px }
+  .brand-name { font-size:22px }
+  .brand-mark { width:30px; height:30px }
+  .brand-context { display:none }
+  .outline { min-height:44px; padding:6px 10px; font-size:13px }
+  .nav { margin:10px 0; gap:6px }
+  .nav button { min-height:46px; padding:6px 5px; gap:5px; justify-content:center }
+  .nav-no { width:22px; height:22px; font-size:11px }
+  .nav-name { font-size:13px; white-space:nowrap }
+  .nav-place { display:none }
+  .viewer { display:flex; flex-direction:column; border-radius:10px }
+  .details { display:contents }
+  .summary { order:0; padding:12px 13px 0 }
+  h1 { font-size:31px; margin-bottom:5px }
+  .quick-view { min-height:44px; margin-bottom:3px; padding-inline:9px; white-space:nowrap }
+  .quick-view svg { width:14px; height:14px }
+  .stage-zoom { top:11px; right:9px }
+  .quick-location { font-size:14px; margin-bottom:1px; gap:6px }
+  .quick-location svg { width:15px; height:17px; margin-top:3px }
+  .recorded { font-size:11px }
+  .steps { order:1; grid-template-columns:repeat(3,minmax(0,1fr)); margin:10px 10px 0; border:1px solid var(--line); border-radius:8px; overflow:hidden }
+  .steps li+li { border-top:0; border-left:1px solid #eee6d8 }
+  .steps button { min-height:44px; padding:5px; gap:5px; justify-content:center; font-size:12px; white-space:nowrap }
+  .step-no { width:21px; height:21px; font-size:12px }
+  .step-label { flex:0 1 auto }
+  .step-arrow { display:none }
+  .instruction { order:2; padding:9px 13px 10px }
+  .instruction h2 { font-size:19px; margin-bottom:3px }
+  .instruction p { font-size:13px; line-height:1.55 }
+  .stage { order:3; padding:9px 10px 8px; border-left:0; border-top:1px solid var(--line) }
+  .photo { height:clamp(235px,44svh,520px); max-width:100% }
+  figcaption { padding-top:6px; gap:8px; font-size:11px }
+  .actions {
+    position:fixed; z-index:3; inset:auto 0 0; min-height:66px; margin:0;
+    padding:8px 12px calc(8px + env(safe-area-inset-bottom)); background:var(--paper);
+    border-top:1px solid var(--line); box-shadow:0 -4px 20px #38261610;
+  }
+  .actions .primary { min-height:49px }
+  .footer { padding-bottom:calc(78px + env(safe-area-inset-bottom)); padding-top:8px }
+  dialog { inset:auto 0 0; width:100%; height:auto; max-height:85dvh; border-radius:16px 16px 0 0 }
+  dialog[open] { animation:sheet-in 280ms var(--motion) both }
+  .proof-inner { padding:12px 15px calc(16px + env(safe-area-inset-bottom)) }
+  .proof-inner::before { content:""; display:block; width:35px; height:4px; margin:0 auto 6px; border-radius:5px; background:#d5c2a2 }
+  .proof-head h2 { font-size:23px }
+  .proof-frame { max-height:44dvh }
+}
+@media (max-width:345px) {
+  .nav-no { display:none }
+  .steps button { font-size:11px }
+}
+.proof-tail { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:8px }
+.proof-tail .proof-caption { margin:0 }
+.proof-tail button { flex:none }
+dialog.zoom-dialog {
+  inset:0; width:100%; height:100dvh; max-height:none; border:0; border-radius:0;
+  background:#211d17; color:#fff9eb; box-shadow:none; overflow:hidden;
+}
+dialog.zoom-dialog[open] { display:flex; flex-direction:column; animation:none }
+.zoom-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left)); background:#2b241b }
+.zoom-head h2 { font:750 18px/1.25 var(--serif) }
+.zoom-tools { display:flex; align-items:center; gap:6px }
+.zoom-tools .icon-btn { width:44px; height:44px; border-color:#786a54; color:#fff9eb; font-size:22px; line-height:1 }
+.zoom-tools .icon-btn:hover { background:#4a3d2b }
+.zoom-tools .icon-btn:disabled { opacity:.43; cursor:default }
+.zoom-tools output { width:47px; font-size:12px; text-align:center; font-variant-numeric:tabular-nums }
+.zoom-scroll { flex:1; min-height:0; overflow:auto; overscroll-behavior:contain }
+.zoom-sheet { display:grid; place-items:center; min-height:100%; min-width:100%; width:max-content; padding:8px }
+.zoom-sheet img { display:block; width:auto; height:auto; max-width:none; object-fit:contain; user-select:none; -webkit-user-drag:none }
+.zoom-caption { font-size:12px; line-height:1.4; color:#f4e7d0; padding:7px 12px calc(7px + env(safe-area-inset-bottom)); background:#2b241b }
+@media(max-width:345px) { .zoom-head h2 { font-size:16px } .zoom-tools output { width:40px } .proof-tail { flex-wrap:wrap } }
+@keyframes sheet-in { from { transform:translateY(100%) } to { transform:translateY(0) } }
+@media (prefers-reduced-motion:reduce) { *, *::before,*::after { animation:none !important; transition:none !important } }
+.search-panel { padding:25px 0 14px }
+.search-kicker { color:var(--amber); font-size:12px; font-weight:750; letter-spacing:.1em }
+.search-panel h1 { margin:5px 0 8px }
+.search-copy { color:var(--muted); margin-bottom:12px; font-size:14px }
+.search-controls { display:flex; align-items:center; gap:8px; max-width:740px }
+.search-controls input { flex:1; min-width:0; height:49px; padding:0 13px; border:1px solid #d8c6a6; border-radius:8px; background:var(--sheet); color:var(--ink); font:inherit; font-size:16px }
+.search-controls input:focus-visible { outline:2px solid var(--amber); outline-offset:2px }
+.search-chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:9px }
+.search-chips button { min-height:44px; padding-inline:12px }
+.search-chips button[aria-pressed="true"] { background:var(--amber-soft); border-color:#b99454; color:#684711 }
+.results-count { margin:13px 0 7px; color:var(--muted); font-size:13px }
+.results { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px }
+.result { display:flex; align-items:center; gap:10px; min-width:0; min-height:62px; padding:9px 12px; border:1px solid var(--line); border-radius:9px; background:var(--sheet); color:var(--ink); text-decoration:none }
+.result:hover { background:var(--amber-light); border-color:#c5ad83 }
+.result:focus-visible { outline:2px solid var(--amber); outline-offset:2px }
+.result-copy { flex:1; min-width:0; display:grid; gap:2px }
+.result-name { font-weight:750; line-height:1.35 }
+.result-path { color:var(--muted); font-size:12px; overflow-wrap:anywhere; line-height:1.45 }
+.result-action { color:var(--amber); font-size:12px; white-space:nowrap; font-weight:700 }
+.result-empty { color:var(--muted); background:var(--sheet); border:1px solid var(--line); border-radius:8px; padding:12px 14px }
+.route-head { display:flex; align-items:center; justify-content:space-between; gap:7px; margin:10px 0 }
+.route-head a { text-decoration:none; color:var(--amber) }
+.photo-status { padding:28px 13px; text-align:center; color:var(--muted) }
+body.search-mode .footer { padding-bottom:20px }
+#stage-instruction { overflow-wrap:anywhere }
+.steps { grid-template-columns:repeat(var(--step-count,3),minmax(0,1fr)) }
+#item-name:focus { outline:none }
+@media(max-width:720px) {
+  .search-panel { padding-top:16px }
+  .results { grid-template-columns:1fr }
+  .result { min-height:57px }
+  .route-head { margin:7px 0 }
+  .steps button { white-space:normal; line-height:1.3 }
+  .proof-tabs { grid-template-columns:repeat(auto-fit,minmax(80px,1fr)) }
+}
+.route-back { display:flex; flex-wrap:wrap; gap:6px }
+.room-index { margin:17px 0 }
+.home-browse-index,
+.home-browse-panel,
+#room-index,
+#browse-panel {
+  color: var(--ink, #292620);
+}
+
+.hb-root {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  color: var(--ink, #292620);
+}
+
+.hb-root h1,
+.hb-root h2,
+.hb-root p,
+.hb-root figure {
+  margin: 0;
+}
+
+.hb-index-header,
+.hb-view-header,
+.hb-section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hb-index-header h2,
+.hb-section-heading h2 {
+  font: 760 23px/1.25 var(--serif, Georgia, serif);
+  overflow-wrap: anywhere;
+}
+
+.hb-view-header {
+  display: block;
+}
+
+.hb-title {
+  margin: 3px 0 7px !important;
+  font: 800 clamp(29px, 4vw, 43px)/1.14 var(--serif, Georgia, serif);
+  overflow-wrap: anywhere;
+}
+
+.hb-title:focus {
+  outline: none;
+}
+
+.hb-lede {
+  color: var(--muted, #685f52);
+  line-height: 1.55;
+}
+
+.hb-index-header .hb-lede {
+  text-align: right;
+  font-size: 13px;
+}
+
+.hb-breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px 7px;
+  color: var(--muted, #685f52);
+  font-size: 13px;
+}
+
+.hb-root .outline,
+.hb-breadcrumb-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line, #e1d6c3);
+  border-radius: 7px;
+  padding: 7px 11px;
+  color: var(--amber, #805716);
+  background: var(--sheet, #fffdf9);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.hb-breadcrumb-link:hover,
+.hb-root .outline:hover {
+  border-color: var(--amber, #805716);
+  background: var(--paper, #faf8f4);
+}
+
+.hb-breadcrumb-current {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink, #292620);
+  font-weight: 700;
+}
+
+.hb-breadcrumb-separator {
+  color: var(--muted, #8a7a63);
+}
+
+.hb-room-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.hb-room-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line, #e1d6c3);
+  border-radius: 11px;
+  background: var(--sheet, #fffdf9);
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 5px 18px #513f2410;
+}
+
+.hb-room-card:hover,
+.hb-room-card:focus-visible,
+.hb-row:hover,
+.hb-item-row:hover {
+  border-color: var(--amber, #805716);
+  background: var(--paper, #faf8f4);
+}
+
+.hb-room-image {
+  display: block;
+  width: 100%;
+  height: 122px;
+  object-fit: cover;
+  object-position: center 55%;
+  background: color-mix(in srgb, var(--paper, #faf8f4) 75%, var(--amber, #805716) 25%);
+}
+
+.hb-room-image-empty {
+  background: linear-gradient(135deg, var(--paper, #faf8f4), var(--sheet, #fffdf9));
+}
+
+.hb-room-meta {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px 12px;
+}
+
+.hb-room-meta strong {
+  font: 750 18px/1.25 var(--serif, Georgia, serif);
+}
+
+.hb-room-meta small,
+.hb-row-content small {
+  color: var(--muted, #685f52);
+  line-height: 1.45;
+}
+
+.hb-room-date {
+  font-size: 11px;
+}
+
+.hb-view-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: start;
+  gap: 14px;
+}
+
+.hb-section {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line, #e1d6c3);
+  border-radius: 11px;
+  background: var(--sheet, #fffdf9);
+  box-shadow: 0 5px 18px #513f2409;
+}
+
+.hb-section-heading {
+  margin-bottom: 11px;
+}
+
+.hb-section-heading h2 {
+  font-size: 20px;
+}
+
+.hb-count {
+  color: var(--muted, #685f52);
+  text-align: right;
+  font-size: 12px;
+}
+
+.hb-row-list,
+.hb-item-list {
+  display: grid;
+  gap: 8px;
+}
+
+.hb-row,
+.hb-item-row {
+  display: flex;
+  min-width: 0;
+  min-height: 56px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 11px;
+  border: 1px solid var(--line, #e1d6c3);
+  border-radius: 8px;
+  background: var(--sheet, #fffdf9);
+  color: inherit;
+  text-decoration: none;
+}
+
+.hb-row-number,
+.hb-item-dot {
+  display: grid;
+  flex: none;
+  width: 31px;
+  height: 31px;
+  place-items: center;
+  border-radius: 7px;
+  color: var(--amber, #805716);
+  background: var(--paper, #faf8f4);
+  font: 700 14px/1 var(--serif, Georgia, serif);
+}
+
+.hb-row-content,
+.hb-item-content {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 3px;
+  overflow-wrap: anywhere;
+}
+
+.hb-row-content strong,
+.hb-item-content strong {
+  font-size: 16px;
+  line-height: 1.32;
+}
+
+.hb-row-content small {
+  font-size: 12px;
+}
+
+.hb-row-arrow {
+  flex: none;
+  color: var(--amber, #805716);
+  font-size: 22px;
+}
+
+.hb-item-row {
+  align-items: flex-start;
+  min-height: 48px;
+}
+
+.hb-item-dot {
+  width: 25px;
+  height: 25px;
+  margin-top: 1px;
+  font-size: 18px;
+}
+
+.hb-item-content {
+  gap: 4px;
+}
+
+.hb-item-detail,
+.hb-provenance {
+  color: var(--muted, #685f52);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.hb-provenance {
+  font-size: 12px;
+}
+
+.hb-empty {
+  color: var(--muted, #685f52);
+  padding: 7px 2px;
+}
+
+.hb-steps {
+  margin: 0;
+  padding-left: 22px;
+  color: var(--muted, #685f52);
+}
+
+.hb-steps li + li {
+  margin-top: 6px;
+}
+
+.hb-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.hb-photo {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line, #e1d6c3);
+  border-radius: 9px;
+  background: var(--sheet, #fffdf9);
+}
+
+.hb-photo-frame {
+  position: relative;
+  overflow: hidden;
+  min-height: 90px;
+  background: var(--paper, #faf8f4);
+}
+
+.hb-photo-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.hb-photo-missing {
+  display: grid;
+  min-height: 120px;
+  place-items: center;
+  color: var(--muted, #685f52);
+  font-size: 13px;
+}
+
+.hb-photo-caption {
+  padding: 8px 10px;
+  color: var(--muted, #685f52);
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.hb-leaders {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.hb-leaders line {
+  stroke: #ffdd8a;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.hb-leaders circle {
+  fill: #ffdd8a;
+  stroke: #5b3d09;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.hb-hotspot {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 7px;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  border: 2px solid #ffe8aa;
+  border-radius: 8px;
+  color: #fff9e9;
+  background: #644109;
+  box-shadow: 0 2px 9px #24170477;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.hb-hotspot:hover,
+.hb-hotspot:focus-visible {
+  background: var(--amber, #805716);
+}
+
+.hb-root a:focus-visible {
+  outline: 2px solid var(--amber, #805716);
+  outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .hb-room-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .hb-room-image {
+    height: 100px;
+  }
+
+  .hb-view-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 430px) {
+  .hb-root {
+    gap: 12px;
+  }
+
+  .hb-index-header,
+  .hb-section-heading {
+    align-items: flex-start;
+  }
+
+  .hb-index-header {
+    display: block;
+  }
+
+  .hb-index-header .hb-lede {
+    margin-top: 4px;
+    text-align: left;
+  }
+
+  .hb-section {
+    padding: 12px;
+  }
+
+  .hb-photo-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hb-room-meta {
+    padding: 8px 9px 10px;
+  }
+
+  .hb-room-meta strong {
+    font-size: 16px;
+  }
+}
+
+.hb-primary-photo .hb-photo-grid { grid-template-columns:1fr; justify-items:center }
+.hb-primary-photo .hb-photo { width:min(100%,330px) }
+@media(max-width:760px) {
+  .hb-primary-photo { order:-1 }
+  .hb-primary-photo .hb-photo { width:min(100%,calc(52svh * .563)) }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 11h16m-11-3h6m-6 7h6"/></svg>
+      </span>
+      <span class="brand-name">家庭找物</span><span class="brand-context">家庭实拍导览</span>
+    </div>
+    <button class="outline" id="open-proof" aria-haspopup="dialog" aria-controls="proof" hidden>
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m3 16 5-5 4 4 3-3 6 5"/><circle cx="15" cy="8" r="1"/></svg>
+      查看证据
+    </button>
+  </header>
+  <main>
+    <section class="search-panel" id="search-panel" aria-labelledby="search-title">
+      <p class="search-kicker">家庭物品档案</p>
+      <h1 id="search-title">搜索家庭物品</h1>
+      <p class="search-copy">输入名称、类别、颜色或收纳位置。点结果，跟着实拍一步步找。</p>
+      <div class="search-controls" role="search" aria-label="搜索家庭物品">
+          <input id="query" type="search" aria-label="搜索名称、类别或颜色" placeholder="输入名称、特征或收纳位置" autocomplete="off">
+        <button class="outline" id="clear-query" type="button" hidden>清除</button>
+      </div>
+      <div class="search-chips" id="search-chips" aria-label="常用搜索"></div>
+      <p class="result-empty" id="route-warning" hidden>这个物品链接在当前页面没有对应记录。可以搜索名称，或回到聊天查它的最新位置。</p>
+      <section class="room-index" id="room-index" aria-label="按房间浏览" hidden></section>
+      <p class="results-count" id="results-count" role="status"></p>
+      <div class="results" id="results"></div>
+      <p class="result-empty" id="results-empty" hidden>当前档案没有匹配的记录。试一个更短的词，或在聊天里描述外观和用途。</p>
+    </section>
+    <section id="browse-panel" hidden></section>
+    <div class="route-head" id="route-head" hidden>
+      <div class="route-back">
+        <a class="outline" href="#search">‹ 返回搜索</a>
+        <a class="outline" id="route-shelf" hidden>返回收纳点</a>
+      </div>
+      <span class="search-kicker">逐步实拍路线</span>
+    </div>
+    <article class="viewer" id="viewer" aria-labelledby="item-name" hidden>
+      <div class="details">
+        <div class="summary">
+          <div class="summary-head">
+            <h1 id="item-name">物品名称</h1>
+            <button class="outline quick-view" id="quick-view" type="button">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m4 16 5-5 4 4 3-3 4 4"/><circle cx="15" cy="8" r="1"/></svg>
+              直接看物品
+            </button>
+          </div>
+          <p class="quick-location">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 10c0 5-7 10-7 10S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.3"/></svg>
+            <span id="target">收纳位置</span>
+          </p>
+          <p class="recorded" id="recorded"></p>
+        </div>
+        <ol id="steps" class="steps" aria-label="找物步骤"></ol>
+        <div class="instruction" aria-live="polite" aria-atomic="true">
+          <h2 id="stage-title"></h2>
+          <p id="stage-instruction"></p>
+        </div>
+        <div class="actions" aria-label="导览控制">
+          <button id="back" class="back" hidden>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg>上一步
+          </button>
+          <button id="next" class="primary">
+            <span id="next-text">下一步</span>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+      <figure class="stage">
+        <div class="photo">
+          <img id="photo" alt="" width="676" height="1200">
+          <svg class="pointer" aria-hidden="true" focusable="false"><line class="pointer-shadow"/><line class="pointer-line"/><circle class="pointer-tip" r="3"/></svg>
+          <button class="hotspot" id="hotspot" aria-label="查看标记位置">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-7-7v14"/></svg>
+          </button>
+        </div>
+        <button class="icon-btn stage-zoom" id="zoom-stage" type="button" aria-haspopup="dialog" aria-label="全屏放大当前照片" title="全屏放大照片">
+          <svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/></svg>
+        </button>
+        <p class="photo-status" id="photo-status" hidden></p>
+        <figcaption><span id="stage-caption"></span><span class="stamp" id="stage-time"></span></figcaption>
+      </figure>
+    </article>
+    <p class="footer">家庭档案 · 位置以最后记录为准</p>
+    <noscript><p>请在支持 JavaScript 的浏览器中打开这个文件，使用照片指路。</p></noscript>
+  </main>
+</div>
+<dialog id="proof" aria-labelledby="proof-title">
+  <div class="proof-inner">
+    <header class="proof-head">
+      <h2 id="proof-title">实拍证据</h2>
+      <button class="icon-btn" id="close-proof" aria-label="关闭证据" autofocus>
+        <svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <p class="proof-path" id="proof-path"></p>
+    <p class="proof-meta" id="proof-meta"></p>
+    <p class="proof-caption" id="proof-note"></p>
+    <div class="proof-tabs" id="proof-tabs" aria-label="选择实拍画面"></div>
+    <img class="proof-frame" id="proof-frame" alt="" width="676" height="1200">
+    <div class="proof-tail">
+      <p class="proof-caption" id="proof-caption" aria-live="polite"></p>
+      <button class="outline" id="zoom-proof" type="button" aria-haspopup="dialog">放大照片</button>
+    </div>
+  </div>
+</dialog>
+<dialog class="zoom-dialog" id="zoom-dialog" aria-labelledby="zoom-title">
+  <header class="zoom-head">
+    <h2 id="zoom-title"></h2>
+    <div class="zoom-tools" aria-label="照片放大控制">
+      <button id="zoom-out" class="icon-btn" type="button" aria-label="缩小照片">−</button>
+      <output id="zoom-scale" aria-live="polite">适屏</output>
+      <button id="zoom-in" class="icon-btn" type="button" aria-label="继续放大照片">+</button>
+      <button id="zoom-close" class="icon-btn" type="button" aria-label="关闭大图" autofocus>×</button>
+    </div>
+  </header>
+  <div class="zoom-scroll" id="zoom-scroll"><div class="zoom-sheet"><img id="zoom-image" alt="" width="676" height="1200"></div></div>
+  <p class="zoom-caption" id="zoom-caption"></p>
+</dialog>
+<script type="application/json" id="guide-data">__GUIDE_DATA__</script>
+<script type="application/json" id="catalog-data">__CATALOG_DATA__</script>
+<script>
+'use strict';
+(function (global) {
+  'use strict';
+
+  const TYPE_LABELS = {
+    visual: '画面确认',
+    spoken: '旁白定位',
+    'visual+spoken': '画面与旁白',
+    user_report: '口述记录'
+  };
+
+  function createHomeBrowse(items, images, linkForItem, displayName, locations) {
+    const sourceItems = Array.isArray(items) ? items.filter(Boolean) : [];
+    const imageMap = images && typeof images === 'object' ? images : {};
+    const locationMap = locations && typeof locations === 'object' ? locations : {};
+    const rooms = new Map();
+    const shelves = new Map();
+
+    function text(value) {
+      return value == null ? '' : String(value);
+    }
+
+    function pathParts(value) {
+      if (!Array.isArray(value)) return [];
+      return value.map(text).map(part => part.trim()).filter(Boolean);
+    }
+
+    function currentItemName(item) {
+      if (typeof displayName === 'function') {
+        try {
+          const value = displayName(item);
+          if (value != null && text(value).trim()) return text(value).trim();
+        } catch (_error) {
+          // Keep the recorded name when the optional formatter cannot resolve it.
+        }
+      } else if (displayName && typeof displayName === 'object') {
+        const value = displayName[item.id];
+        if (value != null && text(value).trim()) return text(value).trim();
+      }
+      return text(item.name).trim() || text(item.id).trim() || '未命名物品';
+    }
+
+    function normalizedPhoto(photo) {
+      if (typeof photo === 'string') return { file: photo, at: '', label: '' };
+      return photo && typeof photo === 'object' ? photo : null;
+    }
+
+    function photoList(value) {
+      if (!Array.isArray(value)) return [];
+      return value.map(normalizedPhoto).filter(photo => photo && text(photo.file).trim());
+    }
+
+    function shelfPhotos(shelf) {
+      const result = [];
+      const seen = new Set();
+      const append = list => {
+        for (const photo of photoList(list)) {
+          const key = text(photo.file) + '|' + text(photo.at);
+          if (seen.has(key)) continue;
+          seen.add(key);
+          result.push(photo);
+        }
+      };
+      if (shelf.raw) append(shelf.raw.photos || shelf.raw.locationPhotos);
+      for (const item of shelf.items) append(item.locationPhotos);
+      return result;
+    }
+
+    function addShelf(id, raw, fallbackPath) {
+      const stableId = text(id).trim();
+      if (!stableId) return null;
+      let shelf = shelves.get(stableId);
+      const rawPath = pathParts(raw && raw.path);
+      const parts = rawPath.length ? rawPath : pathParts(fallbackPath);
+      const roomName = parts[0] || '未归类';
+      const cabinetName = parts[1] || '房间内';
+      const locationName = parts.slice(2).join(' · ') || '这个位置';
+
+      if (!shelf) {
+        shelf = {
+          id: stableId,
+          path: parts.length ? parts : [roomName, cabinetName],
+          room: roomName,
+          cabinet: cabinetName,
+          title: locationName,
+          raw: raw && typeof raw === 'object' ? raw : null,
+          items: []
+        };
+        shelves.set(stableId, shelf);
+        if (!rooms.has(roomName)) rooms.set(roomName, new Map());
+        const cabinets = rooms.get(roomName);
+        if (!cabinets.has(cabinetName)) cabinets.set(cabinetName, []);
+        cabinets.get(cabinetName).push(shelf);
+      } else if ((!shelf.raw || !pathParts(shelf.raw.path).length) && parts.length) {
+        shelf.path = parts;
+        shelf.room = roomName;
+        shelf.cabinet = cabinetName;
+        shelf.title = locationName;
+        shelf.raw = raw && typeof raw === 'object' ? raw : shelf.raw;
+      }
+      return shelf;
+    }
+
+    for (const [id, raw] of Object.entries(locationMap)) {
+      addShelf(id, raw, raw && raw.path);
+    }
+    for (const [index, item] of sourceItems.entries()) {
+      const stableId = text(item.location).trim() || 'unlocated-' + index;
+      const shelf = addShelf(stableId, locationMap[stableId], item.path);
+      if (!shelf) continue;
+      shelf.items.push(item);
+    }
+
+    function roomNames() {
+      const names = Array.from(rooms.keys());
+      return names.sort((a, b) => a.localeCompare(b, 'zh-CN'));
+    }
+
+    function cabinetNames(roomName) {
+      const cabinets = rooms.get(roomName);
+      return cabinets ? Array.from(cabinets.keys()) : [];
+    }
+
+    function locationsIn(roomName, cabinetName) {
+      const cabinets = rooms.get(roomName);
+      return cabinets && cabinets.has(cabinetName) ? cabinets.get(cabinetName) : [];
+    }
+
+    function itemsInRoom(roomName) {
+      const cabinets = rooms.get(roomName);
+      if (!cabinets) return [];
+      const result = [];
+      for (const list of cabinets.values()) for (const shelf of list) result.push(...shelf.items);
+      return result;
+    }
+
+    function itemCountInRoom(roomName) {
+      return itemsInRoom(roomName).length;
+    }
+
+    function latestDate(itemsToCheck) {
+      const dates = itemsToCheck.map(item => text(item.recorded_at).trim()).filter(Boolean).sort();
+      return dates.length ? dates[dates.length - 1] : '';
+    }
+
+    function make(tag, className, label) {
+      const element = global.document.createElement(tag);
+      if (className) element.className = className;
+      if (label != null) element.textContent = text(label);
+      return element;
+    }
+
+    function appendText(parent, tag, className, label) {
+      const element = make(tag, className, label);
+      parent.append(element);
+      return element;
+    }
+
+    function link(className, href, label) {
+      const anchor = make('a', className, label);
+      anchor.href = text(href) || '#search';
+      return anchor;
+    }
+
+    function itemHref(item) {
+      if (typeof linkForItem === 'function') {
+        try {
+          return text(linkForItem(item.id));
+        } catch (_error) {
+          return '#item/' + encodeURIComponent(text(item.id));
+        }
+      }
+      return '#item/' + encodeURIComponent(text(item.id));
+    }
+
+    function hashRoom(roomName) {
+      return '#room/' + encodeURIComponent(roomName);
+    }
+
+    function hashCabinet(roomName, cabinetName) {
+      return '#cabinet/' + encodeURIComponent(roomName) + '/' + encodeURIComponent(cabinetName);
+    }
+
+    function hashShelf(id) {
+      return '#shelf/' + encodeURIComponent(id);
+    }
+
+    function imageAsset(file) {
+      const requested = text(file).trim();
+      if (!requested) return '';
+      if (typeof imageMap[requested] === 'string' && imageMap[requested].startsWith('data:image/')) return imageMap[requested];
+      const normalized = requested.replace(/^\.\//, '').replace(/^附件\//, '');
+      if (typeof imageMap[normalized] === 'string' && imageMap[normalized].startsWith('data:image/')) return imageMap[normalized];
+      const base = normalized.split('/').pop();
+      for (const [key, value] of Object.entries(imageMap)) {
+        if (typeof value !== 'string' || !value.startsWith('data:image/')) continue;
+        const candidate = text(key).replace(/^\.\//, '').replace(/^附件\//, '');
+        if (candidate === normalized || candidate.endsWith('/' + normalized) || candidate.split('/').pop() === base) return value;
+      }
+      return '';
+    }
+
+    function photoCaption(photo, fallback) {
+      const label = text(photo && photo.label).trim() || fallback || '位置实拍';
+      const bits = [label];
+      if (photo && text(photo.at).trim()) bits.push(text(photo.at).trim());
+      const source = text(photo && (photo.source || photo.kind)).trim();
+      if (source) bits.push(TYPE_LABELS[source] || source);
+      return bits.join(' · ');
+    }
+
+    function addBreadcrumbs(parent, entries) {
+      const nav = make('nav', 'hb-breadcrumbs');
+      nav.setAttribute('aria-label', '浏览路径');
+      entries.forEach((entry, index) => {
+        if (index) appendText(nav, 'span', 'hb-breadcrumb-separator', '›');
+        if (entry.href) {
+          const anchor = link('hb-breadcrumb-link', entry.href, entry.label);
+          nav.append(anchor);
+        } else {
+          const current = appendText(nav, 'span', 'hb-breadcrumb-current', entry.label);
+          current.setAttribute('aria-current', 'page');
+        }
+      });
+      parent.append(nav);
+      return nav;
+    }
+
+    function addHeading(parent, title, lede) {
+      const header = make('header', 'hb-view-header');
+      const h1 = appendText(header, 'h1', 'hb-title', title);
+      h1.tabIndex = -1;
+      if (lede) appendText(header, 'p', 'hb-lede', lede);
+      parent.append(header);
+      return h1;
+    }
+
+    function photoFigure(photo, caption, markers) {
+      const figure = make('figure', 'hb-photo');
+      const frame = make('div', 'hb-photo-frame');
+      const src = imageAsset(photo && photo.file);
+      if (src) {
+        const image = make('img', 'hb-photo-image');
+        image.src = src;
+        image.alt = text(photo && photo.label) || caption || '收纳位置实拍';
+        image.loading = 'lazy';
+        frame.append(image);
+        addHotspots(frame, markers || []);
+      } else {
+        appendText(frame, 'div', 'hb-photo-missing', '照片暂不可用');
+      }
+      figure.append(frame);
+      appendText(figure, 'figcaption', 'hb-photo-caption', caption || photoCaption(photo));
+      return figure;
+    }
+
+    function addHotspots(frame, markers) {
+      if (!markers.length) return;
+      const svg = global.document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('class', 'hb-leaders');
+      svg.setAttribute('viewBox', '0 0 1000 1000');
+      svg.setAttribute('preserveAspectRatio', 'none');
+      svg.setAttribute('aria-hidden', 'true');
+      for (const marker of markers) {
+        const [x, y, bx, by] = marker.coordinates;
+        const line = global.document.createElementNS(svg.namespaceURI, 'line');
+        line.setAttribute('x1', String(x * 10));
+        line.setAttribute('y1', String(y * 10));
+        line.setAttribute('x2', String(bx * 10));
+        line.setAttribute('y2', String(by * 10));
+        const dot = global.document.createElementNS(svg.namespaceURI, 'circle');
+        dot.setAttribute('cx', String(x * 10));
+        dot.setAttribute('cy', String(y * 10));
+        dot.setAttribute('r', '9');
+        svg.append(line, dot);
+      }
+      frame.append(svg);
+      for (const marker of markers) {
+        const anchor = link('hb-hotspot', marker.href, marker.label);
+        anchor.setAttribute('aria-label', marker.accessible || marker.label);
+        anchor.style.left = marker.coordinates[2] + '%';
+        anchor.style.top = marker.coordinates[3] + '%';
+        frame.append(anchor);
+      }
+    }
+
+    function section(title, detail) {
+      const block = make('section', 'hb-section');
+      const heading = make('div', 'hb-section-heading');
+      appendText(heading, 'h2', '', title);
+      if (detail) appendText(heading, 'span', 'hb-count', detail);
+      block.append(heading);
+      return block;
+    }
+
+    function locationRow(shelf, index, href) {
+      const anchor = link('hb-row', href, '');
+      appendText(anchor, 'span', 'hb-row-number', String(index + 1));
+      const content = make('span', 'hb-row-content');
+      appendText(content, 'strong', '', shelf.title);
+      const count = shelf.items.length;
+      const supporting = count ? count + ' 件物品' : '目前没有物品记录';
+      const date = latestDate(shelf.items);
+      appendText(content, 'small', '', [supporting, date].filter(Boolean).join(' · '));
+      anchor.append(content);
+      appendText(anchor, 'span', 'hb-row-arrow', '›');
+      return anchor;
+    }
+
+    function cabinetCard(roomName, cabinetName, index) {
+      const shelfList = locationsIn(roomName, cabinetName);
+      const itemsInCabinet = shelfList.flatMap(shelf => shelf.items);
+      const anchor = link('hb-row hb-cabinet-row', hashCabinet(roomName, cabinetName), '');
+      appendText(anchor, 'span', 'hb-row-number', String(index + 1));
+      const content = make('span', 'hb-row-content');
+      appendText(content, 'strong', '', cabinetName);
+      appendText(content, 'small', '', shelfList.length + ' 个位置 · ' + itemsInCabinet.length + ' 件物品');
+      anchor.append(content);
+      appendText(anchor, 'span', 'hb-row-arrow', '›');
+      return anchor;
+    }
+
+    function bestRoomPhoto(roomName) {
+      for (const cabinetName of cabinetNames(roomName)) {
+        for (const shelf of locationsIn(roomName, cabinetName)) {
+          const photo = shelfPhotos(shelf).find(candidate => imageAsset(candidate.file));
+          if (photo) return photo;
+        }
+      }
+      return null;
+    }
+
+    function sourceCaption(item) {
+      const pieces = [];
+      const kind = text(item.kind || item.source).trim();
+      if (kind) pieces.push(TYPE_LABELS[kind] || kind);
+      if (text(item.at).trim()) pieces.push(text(item.at).trim());
+      if (text(item.recorded_at).trim()) pieces.push('记录于 ' + text(item.recorded_at).trim());
+      if (text(item.note).trim()) pieces.push(text(item.note).trim());
+      return pieces.join(' · ');
+    }
+
+    function itemRow(item) {
+      const name = currentItemName(item);
+      const anchor = link('hb-item-row', itemHref(item), '');
+      anchor.setAttribute('aria-label', '打开' + name + '的详细找物指南');
+      appendText(anchor, 'span', 'hb-item-dot', '•');
+      const content = make('span', 'hb-item-content');
+      appendText(content, 'strong', '', name);
+      if (text(item.detail).trim()) appendText(content, 'span', 'hb-item-detail', text(item.detail).trim());
+      const provenance = sourceCaption(item);
+      if (provenance) appendText(content, 'small', 'hb-provenance', provenance);
+      anchor.append(content);
+      appendText(anchor, 'span', 'hb-row-arrow', '›');
+      return anchor;
+    }
+
+    function itemsSection(shelf) {
+      const block = section('这里记录了什么', shelf.items.length + ' 条');
+      const list = make('div', 'hb-item-list');
+      if (shelf.items.length) {
+        for (const item of shelf.items) list.append(itemRow(item));
+      } else {
+        appendText(list, 'p', 'hb-empty', '这个位置目前没有物品记录。');
+      }
+      block.append(list);
+      return block;
+    }
+
+    function stepsList(shelf) {
+      const steps = Array.isArray(shelf.raw && shelf.raw.steps) ? shelf.raw.steps : [];
+      if (!steps.length) return null;
+      const list = make('ol', 'hb-steps');
+      for (const step of steps) appendText(list, 'li', '', step);
+      return list;
+    }
+
+    function photoStrip(parent, photos, markerFactory, limit) {
+      const list = make('div', 'hb-photo-grid');
+      let shown = 0;
+      for (const photo of photos) {
+        if (!imageAsset(photo.file)) continue;
+        const markers = typeof markerFactory === 'function' ? markerFactory(photo) : [];
+        list.append(photoFigure(photo, photoCaption(photo), markers));
+        shown += 1;
+        if (limit && shown >= limit) break;
+      }
+      if (shown) parent.append(list);
+      return shown;
+    }
+
+    function renderIndex(container) {
+      if (!container || typeof container.replaceChildren !== 'function') return false;
+      const root = make('div', 'hb-root hb-index');
+      const header = make('header', 'hb-index-header');
+      appendText(header, 'h2', '', '按房间浏览');
+      const totalItems = sourceItems.length;
+      const totalLocations = shelves.size;
+      appendText(header, 'p', 'hb-lede', roomNames().length + ' 个房间 · ' + totalLocations + ' 个位置 · ' + totalItems + ' 件物品');
+      root.append(header);
+      const grid = make('div', 'hb-room-grid');
+      for (const roomName of roomNames()) {
+        const anchor = link('hb-room-card', hashRoom(roomName), '');
+        const photo = bestRoomPhoto(roomName);
+        const src = photo && imageAsset(photo.file);
+        if (src) {
+          const image = make('img', 'hb-room-image');
+          image.src = src;
+          image.alt = roomName + '位置参照';
+          image.loading = 'lazy';
+          anchor.append(image);
+        } else {
+          anchor.append(make('div', 'hb-room-image hb-room-image-empty', ''));
+        }
+        const meta = make('span', 'hb-room-meta');
+        appendText(meta, 'strong', '', roomName);
+        const cabinets = cabinetNames(roomName);
+        appendText(meta, 'small', '', cabinets.length + ' 个柜区 · ' + itemCountInRoom(roomName) + ' 条');
+        const date = latestDate(itemsInRoom(roomName));
+        if (date) appendText(meta, 'small', 'hb-room-date', '最近记录 ' + date);
+        anchor.append(meta);
+        grid.append(anchor);
+      }
+      root.append(grid);
+      container.replaceChildren(root);
+      return true;
+    }
+
+    function renderRoom(container, roomName) {
+      if (!rooms.has(roomName)) return false;
+      const root = make('div', 'hb-root hb-view');
+      addBreadcrumbs(root, [{ label: '全屋', href: '#search' }, { label: roomName }]);
+      const h1 = addHeading(root, roomName, '选择房间内的柜体或区域，再进入具体位置。');
+      const body = make('div', 'hb-view-grid');
+      const cabinetSection = section('柜体与区域', cabinetNames(roomName).length + ' 个');
+      const cabinetList = make('div', 'hb-row-list');
+      cabinetNames(roomName).forEach((cabinetName, index) => cabinetList.append(cabinetCard(roomName, cabinetName, index)));
+      cabinetSection.append(cabinetList);
+      body.append(cabinetSection);
+      const roomLocations = [];
+      for (const cabinetName of cabinetNames(roomName)) roomLocations.push(...locationsIn(roomName, cabinetName));
+      const photos = [];
+      const seen = new Set();
+      for (const shelf of roomLocations) for (const photo of shelfPhotos(shelf)) {
+        const key = text(photo.file) + '|' + text(photo.at);
+        if (!seen.has(key)) { seen.add(key); photos.push(photo); }
+      }
+      if (photos.length) {
+        const photoSection = section('房间位置实拍', '可用于辨认周边环境');
+        photoStrip(photoSection, photos, null, 4);
+        body.append(photoSection);
+      }
+      root.append(body);
+      container.replaceChildren(root);
+      h1.focus({ preventScroll: true });
+      return true;
+    }
+
+    function renderCabinet(container, roomName, cabinetName) {
+      const shelfList = locationsIn(roomName, cabinetName);
+      if (!rooms.has(roomName) || !rooms.get(roomName).has(cabinetName)) return false;
+      const root = make('div', 'hb-root hb-view');
+      addBreadcrumbs(root, [
+        { label: '全屋', href: '#search' },
+        { label: roomName, href: hashRoom(roomName) },
+        { label: cabinetName }
+      ]);
+      const h1 = addHeading(root, cabinetName, '选择其中一层或一个位置查看实拍、找物步骤和当前记录。');
+      const body = make('div', 'hb-view-grid');
+      const shelfSection = section('位置', shelfList.length + ' 个');
+      const shelfRows = make('div', 'hb-row-list');
+      shelfList.forEach((shelf, index) => shelfRows.append(locationRow(shelf, index, hashShelf(shelf.id))));
+      shelfSection.append(shelfRows);
+      body.append(shelfSection);
+      const photos = [];
+      const seen = new Set();
+      for (const shelf of shelfList) for (const photo of shelfPhotos(shelf)) {
+        const key = text(photo.file) + '|' + text(photo.at);
+        if (!seen.has(key)) { seen.add(key); photos.push(photo); }
+      }
+      if (photos.length) {
+        const photoSection = section('柜体实拍', '辨认柜体和位置');
+        photoStrip(photoSection, photos, null, 5);
+        body.append(photoSection);
+      }
+      root.append(body);
+      container.replaceChildren(root);
+      h1.focus({ preventScroll: true });
+      return true;
+    }
+
+    function renderShelf(container, id) {
+      const shelf = shelves.get(id);
+      if (!shelf) return false;
+      const root = make('div', 'hb-root hb-view');
+      addBreadcrumbs(root, [
+        { label: '全屋', href: '#search' },
+        { label: shelf.room, href: hashRoom(shelf.room) },
+        { label: shelf.cabinet, href: hashCabinet(shelf.room, shelf.cabinet) },
+        { label: shelf.title }
+      ]);
+      const h1 = addHeading(root, shelf.title, '查看位置照片、找物步骤和这个位置当前记录的物品。');
+      const body = make('div', 'hb-view-grid hb-shelf-view');
+      const itemBlock = itemsSection(shelf);
+      body.append(itemBlock);
+      const steps = stepsList(shelf);
+      if (steps) {
+        const stepSection = section('怎么找到这里', '');
+        stepSection.append(steps);
+        body.append(stepSection);
+      }
+      const photos = shelfPhotos(shelf);
+      if (photos.length) {
+        const photoSection = section('位置实拍', photos.length + ' 张');
+        if (photoStrip(photoSection, photos, null)) {
+          body.append(photoSection);
+        }
+      }
+      root.append(body);
+      container.replaceChildren(root);
+      h1.focus({ preventScroll: true });
+      return true;
+    }
+
+    function renderView(container, parts) {
+      if (!container || typeof container.replaceChildren !== 'function' || !Array.isArray(parts)) return false;
+      const decoded = parts.map(part => text(part));
+      if (decoded[0] === 'room' && decoded.length === 2) return renderRoom(container, decoded[1]);
+      if (decoded[0] === 'cabinet' && decoded.length === 3) return renderCabinet(container, decoded[1], decoded[2]);
+      if (decoded[0] === 'shelf' && decoded.length === 2) return renderShelf(container, decoded[1]);
+      return false;
+    }
+
+    return { renderIndex, renderView };
+  }
+
+  global.createHomeBrowse = createHomeBrowse;
+})(window);
+
+const get = id => document.getElementById(id);
+const text = (id, value) => { get(id).textContent = value; };
+const create = (tag, className, value = '') => {
+  const element = document.createElement(tag);
+  element.className = className;
+  element.textContent = value;
+  return element;
+};
+const legacy = new Map(JSON.parse(get('guide-data').textContent).map(route => [route.id,route]));
+const {items,images,locations} = JSON.parse(get('catalog-data').textContent);
+const byId = new Map(items.map(item => [item.id,item]));
+const roomNames = new Set(Object.values(locations).map(location => location.path[0]));
+const wholeHome = roomNames.size !== 1;
+const scope = wholeHome ? '全屋' : [...roomNames][0];
+text('search-title','搜索' + scope);
+if (wholeHome) get('query').placeholder = '输入名称、特征或收纳位置';
+document.title = '家庭找物 · ' + scope + '实拍导览';
+document.querySelector('.brand-context').textContent = scope + '实拍导览';
+
+const kindLabels = {visual:'实拍',spoken:'旁白定位','visual+spoken':'实拍与旁白',user_report:'口述位置'};
+const colors = {
+  '绿色': /绿色|深绿|浅绿/u,
+  '蓝色': /蓝色|深蓝|浅蓝/u,
+  '红色': /红色|深红|浅红/u,
+  '白色': /白色|乳白|米白/u,
+  '黑色': /黑色|灰黑/u,
+  '黄色': /黄色|深黄|浅黄/u,
+  '橙色': /橙色|深橙|浅橙/u,
+};
+const normalized = value => value.normalize('NFKC').trim().toLowerCase().replace(/\s+/gu,' ');
+function featureTags(item) {
+  const names = [item.name,...item.aliases,item.detail].join(' ');
+  const tags = Object.entries(colors).filter(([,pattern]) => pattern.test(names)).map(([name]) => name);
+  return [...new Set(tags)];
+}
+const displayName = item => item.name;
+const searchAliases = item => item.aliases;
+const searchable = items.map(item => ({
+  item, name:normalized(displayName(item)), aliases:searchAliases(item).map(normalized),
+  path:normalized(item.path.join(' ')), tags:featureTags(item),
+}));
+const tags = [...new Set(searchable.flatMap(entry => entry.tags))].slice(0, 6);
+const queryInput = get('query');
+const searchPanel = get('search-panel');
+const viewer = get('viewer');
+const searchList = get('results');
+const searchChips = get('search-chips');
+const proof = get('proof');
+const zoom = get('zoom-dialog');
+const next = get('next');
+const back = get('back');
+const photo = get('photo');
+const hotspot = get('hotspot');
+const photoBox = photo.parentElement;
+const pointer = photoBox.querySelector('.pointer');
+const stepList = get('steps');
+const proofTabs = get('proof-tabs');
+const zoomImage = get('zoom-image');
+const zoomScroll = get('zoom-scroll');
+const zoomLevels = [1,1.6,2.4];
+let active = null;
+let stepIndex = 0;
+let proofIndex = 0;
+let zoomIndex = 0;
+let proofTrigger = null;
+let zoomTrigger = null;
+let resultTrigger = null;
+
+function tokenize(raw) {
+  const phrase = normalized(raw).replace(/^(帮我找一下|帮我找|我想找)/u,'')
+    .replace(/(?:的)?(?:什么东西|东西|物品)$/u,'')
+    .replace(/调味料|调味品/gu,'调料')
+    .replace(/(绿色|蓝色|红色|白色|黑色|黄色|橙色)的?/gu,' $1 ')
+    .trim();
+  return phrase.split(/[\s、，,]+/u).filter(Boolean);
+}
+function relevance(entry, terms, whole) {
+  let score = 0;
+  for (const term of terms) {
+    if (entry.name === term) score += 70;
+    else if (entry.aliases.includes(term)) score += 55;
+    else if (entry.name.includes(term)) score += 40;
+    else if (entry.aliases.some(alias => alias.includes(term))) score += 30;
+    else if (entry.tags.includes(term)) score += 25;
+    else if (entry.path.includes(term)) score += 15;
+    else return -1;
+  }
+  return score + (entry.name === whole ? 120 : 0) + (legacy.has(entry.item.id) ? 2 : 0);
+}
+const routeLink = id => '#' + encodeURIComponent(id);
+const roomIndex = get('room-index');
+const browsePanel = get('browse-panel');
+const browse = createHomeBrowse(items,images,routeLink,displayName,locations);
+if (wholeHome) browse.renderIndex(roomIndex);
+function renderResults() {
+  const value = queryInput.value;
+  const terms = tokenize(value);
+  roomIndex.hidden = !wholeHome || terms.length>0;
+  const matches = searchable.map(entry => ({...entry,score:relevance(entry,terms,normalized(value))}))
+    .filter(entry => entry.score >= 0).sort((a,b) => b.score-a.score);
+  text('results-count',terms.length ? '找到 ' + matches.length + ' 条记录' : '全部记录 · ' + matches.length + ' 件或分组');
+  get('results-empty').hidden = matches.length > 0;
+  get('clear-query').hidden = value === '';
+  for (const chip of searchChips.children) chip.setAttribute('aria-pressed',String(value === chip.textContent));
+  const rows = matches.map(({item,tags}) => {
+    const row = create('a','result');
+    row.href = routeLink(item.id);
+    const copy = create('span','result-copy');
+    const path = item.path.slice(roomNames.size === 1 ? 1 : 0).join(' › ');
+    copy.append(create('span','result-name',displayName(item)),
+      create('span','result-path',[path,...tags].filter(Boolean).join(' · ')));
+    row.append(copy,create('span','result-action','开始指路 ›'));
+    row.addEventListener('click',() => { resultTrigger = row; });
+    return row;
+  });
+  searchList.replaceChildren(...rows);
+}
+for (const tag of tags) {
+  const chip = create('button','outline',tag);
+  chip.type = 'button';
+  chip.addEventListener('click',() => {
+    queryInput.value = queryInput.value === tag ? '' : tag;
+    renderResults();
+  });
+  searchChips.append(chip);
+}
+queryInput.addEventListener('input',renderResults);
+get('clear-query').addEventListener('click',() => {
+  queryInput.value = '';
+  renderResults();
+  queryInput.focus();
+});
+renderResults();
+
+function guideFor(item) {
+  const recipe = legacy.get(item.id);
+  if (recipe) {
+    return {...recipe, name:item.aliases.includes(recipe.name) ? recipe.name : displayName(item), note:item.note, steps:recipe.steps.map((step,i) => ({
+      ...step, evidenceLabel:step.evidenceLabel || (i===0 ? '柜体外观' : i===recipe.steps.length-1 ? '物品近照' : '打开后'),
+    }))};
+  }
+  const steps = [];
+  const stepsText = item.steps.length ? item.steps : ['到达 ' + item.path.join(' › ') + '。'];
+  const locationCount = Math.max(stepsText.length,item.locationPhotos.length);
+  for (let i=0;i<locationCount;i++) {
+    const frame = item.locationPhotos[i];
+    steps.push({
+      label:i===0 ? '认位置' : '看收纳处', title:i===0 ? '找到收纳位置' : '到收纳处',
+      instruction:stepsText[i] || frame.label, action:i+1===locationCount ? '看物品记录' : '下一步',
+      evidenceLabel:'位置参照', src:frame && images[frame.file], at:frame?.at, alt:frame?.label || '',
+    });
+  }
+  const proofs = item.itemPhotos.length ? item.itemPhotos : [null];
+  for (const [i,frame] of proofs.entries()) {
+    const objectPhoto = Boolean(frame) && item.kind !== 'spoken' && item.kind !== 'user_report';
+    steps.push({
+      label:objectPhoto ? '认物品' : '看记录', title:objectPhoto ? '核对物品外观' : '查看已记录范围',
+      instruction:item.detail || item.note || item.path.join(' › '), action:i+1===proofs.length ? '查看证据' : '下一步',
+      evidenceLabel:objectPhoto ? '物品实拍' : frame ? '位置参照' : '位置记录',
+      src:frame && images[frame.file], at:frame?.at, alt:frame?.label || '',
+    });
+  }
+  return {
+    id:item.id,name:displayName(item),path:item.path,steps,note:item.note,date:item.recorded_at,
+    target:item.path.slice(wholeHome ? 0 : 1).join(' › ') || item.path[0],proof:kindLabels[item.kind] || '档案记录',source:item.source,
+  };
+}
+function button(value, action) {
+  const el = create('button','',value);
+  el.type = 'button';
+  el.addEventListener('click',action);
+  return el;
+}
+function renderControls() {
+  stepList.style.setProperty('--step-count',String(Math.min(active.steps.length,3)));
+  stepList.replaceChildren(...active.steps.map((step,index) => {
+    const control = button('',() => showStep(index));
+    control.append(create('span','step-no',String(index+1)),create('span','step-label',step.label));
+    const row = create('li','');
+    row.append(control);
+    return row;
+  }));
+  proofTabs.replaceChildren(...active.steps.map((step,index) => button(step.evidenceLabel,() => showProofFrame(index))));
+}
+function drawPointer() {
+  if (!active) return;
+  const step = active.steps[stepIndex];
+  const pin = legacy.has(active.id) ? step.marker : null;
+  const point = pin?.target || step.point;
+  hotspot.hidden = !pin || !point || !step.src;
+  pointer.style.display = hotspot.hidden ? 'none' : '';
+  if (hotspot.hidden) return;
+  hotspot.style.setProperty('--x',pin.button[0]+'%');
+  hotspot.style.setProperty('--y',pin.button[1]+'%');
+  const x1 = photoBox.clientWidth * point[0] / 100;
+  const y1 = photoBox.clientHeight * point[1] / 100;
+  for (const line of pointer.querySelectorAll('line')) {
+    line.setAttribute('x1',x1);
+    line.setAttribute('y1',y1);
+    line.setAttribute('x2',hotspot.offsetLeft);
+    line.setAttribute('y2',hotspot.offsetTop);
+  }
+  pointer.querySelector('circle').setAttribute('cx',x1);
+  pointer.querySelector('circle').setAttribute('cy',y1);
+}
+function showStep(index) {
+  stepIndex = index;
+  const step = active.steps[index];
+  const final = index === active.steps.length-1;
+  for (const [i,control] of [...stepList.querySelectorAll('button')].entries()) {
+    if (i===index) control.setAttribute('aria-current','step');
+    else control.removeAttribute('aria-current');
+  }
+  photoBox.hidden = !step.src;
+  get('zoom-stage').hidden = !step.src;
+  get('photo-status').hidden = Boolean(step.src);
+  text('photo-status','这一环节按已记录的位置说明核对。');
+  if (step.src) {
+    photo.src = step.src;
+    photo.alt = step.alt;
+    photo.classList.remove('frame-in');
+    void photo.offsetWidth;
+    photo.classList.add('frame-in');
+  } else photo.removeAttribute('src');
+  drawPointer();
+  hotspot.setAttribute('aria-label',step.action);
+  for (const control of [next,hotspot]) {
+    if (final) control.setAttribute('aria-haspopup','dialog');
+    else control.removeAttribute('aria-haspopup');
+  }
+  text('stage-title',step.title);
+  text('stage-instruction',step.instruction);
+  text('next-text',step.action);
+  text('stage-caption',String(index+1).padStart(2,'0') + ' / ' + String(active.steps.length).padStart(2,'0') + ' · ' + step.evidenceLabel);
+  text('stage-time',step.at ? '原片 ' + step.at : '');
+  if (index===0 && document.activeElement===back) next.focus();
+  back.hidden = index===0;
+}
+function renderRoute(item) {
+  active = guideFor(item);
+  text('item-name',active.name);
+  text('target',active.target);
+  text('recorded','上次记录 ' + active.date + ' · ' + active.proof);
+  const direct = get('quick-view');
+  direct.hidden = active.steps.length<2;
+  const lastLabel = active.steps.at(-1).evidenceLabel;
+  direct.lastChild.textContent = ['物品实拍','物品近照'].includes(lastLabel) ? ' 直接看物品' : ' 直接看记录';
+  renderControls();
+  showStep(0);
+}
+function renderHash(focus = false) {
+  let id = '';
+  let parts = [];
+  try {
+    const fragment = location.hash.slice(1);
+    id = decodeURIComponent(fragment);
+    parts = fragment.split('/').map(decodeURIComponent);
+  } catch (_) { /* An invalid fragment returns to search. */ }
+  if (id.startsWith('search=')) {
+    queryInput.value = id.slice('search='.length);
+    renderResults();
+  }
+  const item = byId.get(parts[0] === 'item' ? parts[1] : id);
+  const browsing = !item && browse.renderView(browsePanel,parts);
+  get('route-warning').hidden = Boolean(item) || browsing || !id || id === 'search' || id.startsWith('search=');
+  searchPanel.hidden = Boolean(item) || browsing;
+  browsePanel.hidden = !browsing;
+  viewer.hidden = !item;
+  get('route-head').hidden = !item;
+  get('open-proof').hidden = !item;
+  document.body.classList.toggle('search-mode',!item);
+  if (item) {
+    renderRoute(item);
+    const shelfLink = get('route-shelf');
+    shelfLink.href = '#shelf/' + encodeURIComponent(item.location);
+    shelfLink.hidden = !wholeHome;
+  } else {
+    active = null;
+  }
+  if (!focus) return;
+  if (item || browsing) {
+    const title = item ? get('item-name') : browsePanel.querySelector('h1');
+    if (title) {
+      title.tabIndex = -1;
+      title.focus({preventScroll:true});
+    }
+    window.scrollTo(0,0);
+  } else if (resultTrigger?.isConnected) {
+    resultTrigger.focus();
+  } else {
+    queryInput.focus();
+  }
+}
+function frameDescription(step) {
+  return [step.at ? '原片 ' + step.at : '',step.alt || step.instruction].filter(Boolean).join(' · ');
+}
+function showProofFrame(index) {
+  proofIndex = index;
+  const step = active.steps[index];
+  const image = get('proof-frame');
+  image.hidden = !step.src;
+  get('zoom-proof').hidden = !step.src;
+  if (step.src) {
+    image.src = step.src;
+    image.alt = step.alt;
+  } else image.removeAttribute('src');
+  for (const [i,control] of [...proofTabs.children].entries()) control.setAttribute('aria-pressed',String(i===index));
+  text('proof-caption',frameDescription(step));
+}
+function openProof(trigger) {
+  proofTrigger = trigger;
+  text('proof-title',active.name + ' · 证据');
+  text('proof-path',active.path.join(' › '));
+  text('proof-meta',[active.source,active.date,active.proof].filter(Boolean).join(' · '));
+  text('proof-note',active.note || '');
+  showProofFrame(stepIndex);
+  proof.showModal();
+}
+function fitZoom(keepCenter = false) {
+  if (!zoom.open || !zoomImage.naturalWidth) return;
+  const centerX = keepCenter ? (zoomScroll.scrollLeft+zoomScroll.clientWidth/2)/zoomScroll.scrollWidth : .5;
+  const centerY = keepCenter ? (zoomScroll.scrollTop+zoomScroll.clientHeight/2)/zoomScroll.scrollHeight : .5;
+  const fit = Math.min(zoomScroll.clientWidth-16,(zoomScroll.clientHeight-16)*zoomImage.naturalWidth/zoomImage.naturalHeight);
+  zoomImage.style.width = Math.max(1,Math.floor(fit*zoomLevels[zoomIndex]))+'px';
+  zoomScroll.scrollLeft = zoomScroll.scrollWidth*centerX-zoomScroll.clientWidth/2;
+  zoomScroll.scrollTop = zoomScroll.scrollHeight*centerY-zoomScroll.clientHeight/2;
+  get('zoom-out').disabled = zoomIndex===0;
+  get('zoom-in').disabled = zoomIndex===zoomLevels.length-1;
+  text('zoom-scale',zoomIndex ? zoomLevels[zoomIndex]+'×' : '适屏');
+}
+function openZoom(index,trigger) {
+  const step = active.steps[index];
+  if (!step.src) return;
+  zoomTrigger = trigger;
+  zoomIndex = 0;
+  zoomImage.src = step.src;
+  zoomImage.alt = step.alt;
+  text('zoom-title',active.name + ' · 实拍');
+  text('zoom-caption',frameDescription(step));
+  zoom.showModal();
+  fitZoom();
+}
+function advance(event) {
+  if (stepIndex<active.steps.length-1) showStep(stepIndex+1);
+  else openProof(event.currentTarget);
+}
+
+next.addEventListener('click',advance);
+hotspot.addEventListener('click',advance);
+back.addEventListener('click',() => { if (stepIndex>0) showStep(stepIndex-1); });
+get('quick-view').addEventListener('click',() => showStep(active.steps.length-1));
+get('open-proof').addEventListener('click',event => openProof(event.currentTarget));
+get('close-proof').addEventListener('click',() => proof.close());
+proof.addEventListener('close',() => proofTrigger?.focus());
+proof.addEventListener('click',event => {
+  if (event.target!==proof) return;
+  const rect = proof.getBoundingClientRect();
+  if (event.clientX<rect.left || event.clientX>rect.right || event.clientY<rect.top || event.clientY>rect.bottom) proof.close();
+});
+get('zoom-stage').addEventListener('click',event => openZoom(stepIndex,event.currentTarget));
+get('zoom-proof').addEventListener('click',event => openZoom(proofIndex,event.currentTarget));
+get('zoom-in').addEventListener('click',() => { if (zoomIndex<zoomLevels.length-1) { zoomIndex++; fitZoom(true); } });
+get('zoom-out').addEventListener('click',() => { if (zoomIndex>0) { zoomIndex--; fitZoom(true); } });
+get('zoom-close').addEventListener('click',() => zoom.close());
+zoom.addEventListener('close',() => zoomTrigger?.focus());
+zoomImage.addEventListener('load',() => fitZoom());
+window.addEventListener('resize',() => { drawPointer(); fitZoom(true); });
+window.addEventListener('hashchange',() => {
+  if (zoom.open) zoom.close();
+  if (proof.open) proof.close();
+  renderHash(true);
+});
+renderHash();
+</script>
+</body>
+</html>
