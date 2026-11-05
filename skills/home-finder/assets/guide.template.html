@@ -730,7 +730,7 @@ body.search-mode .footer { padding-bottom:20px }
       </div>
       <div class="search-chips" id="search-chips" aria-label="常用搜索"></div>
       <p class="result-empty" id="route-warning" hidden>这个物品链接在当前页面没有对应记录。可以搜索名称，或回到聊天查它的最新位置。</p>
-      <section class="room-index" id="room-index" aria-label="按房间浏览" hidden></section>
+      <section class="room-index" id="room-index" aria-label="按房间浏览"></section>
       <p class="results-count" id="results-count" role="status"></p>
       <div class="results" id="results"></div>
       <p class="result-empty" id="results-empty" hidden>当前档案没有匹配的记录。试一个更短的词，或在聊天里描述外观和用途。</p>
@@ -942,8 +942,7 @@ body.search-mode .footer { padding-bottom:20px }
     }
 
     function roomNames() {
-      const names = Array.from(rooms.keys());
-      return names.sort((a, b) => a.localeCompare(b, 'zh-CN'));
+      return Array.from(rooms.keys());
     }
 
     function cabinetNames(roomName) {
@@ -1259,7 +1258,7 @@ body.search-mode .footer { padding-bottom:20px }
     function renderRoom(container, roomName) {
       if (!rooms.has(roomName)) return false;
       const root = make('div', 'hb-root hb-view');
-      addBreadcrumbs(root, [{ label: '全屋', href: '#search' }, { label: roomName }]);
+      addBreadcrumbs(root, [{ label: '导览首页', href: '#search' }, { label: roomName }]);
       const h1 = addHeading(root, roomName, '选择房间内的柜体或区域，再进入具体位置。');
       const body = make('div', 'hb-view-grid');
       const cabinetSection = section('柜体与区域', cabinetNames(roomName).length + ' 个');
@@ -1291,7 +1290,7 @@ body.search-mode .footer { padding-bottom:20px }
       if (!rooms.has(roomName) || !rooms.get(roomName).has(cabinetName)) return false;
       const root = make('div', 'hb-root hb-view');
       addBreadcrumbs(root, [
-        { label: '全屋', href: '#search' },
+        { label: '导览首页', href: '#search' },
         { label: roomName, href: hashRoom(roomName) },
         { label: cabinetName }
       ]);
@@ -1324,7 +1323,7 @@ body.search-mode .footer { padding-bottom:20px }
       if (!shelf) return false;
       const root = make('div', 'hb-root hb-view');
       addBreadcrumbs(root, [
-        { label: '全屋', href: '#search' },
+        { label: '导览首页', href: '#search' },
         { label: shelf.room, href: hashRoom(shelf.room) },
         { label: shelf.cabinet, href: hashCabinet(shelf.room, shelf.cabinet) },
         { label: shelf.title }
@@ -1460,11 +1459,17 @@ const routeLink = id => '#' + encodeURIComponent(id);
 const roomIndex = get('room-index');
 const browsePanel = get('browse-panel');
 const browse = createHomeBrowse(items,images,routeLink,displayName,locations);
-if (wholeHome) browse.renderIndex(roomIndex);
+browse.renderIndex(roomIndex);
 function renderResults() {
   const value = queryInput.value;
   const terms = tokenize(value);
-  roomIndex.hidden = !wholeHome || terms.length>0;
+  const afterResults = get('results-empty');
+  const beforeResults = get('results-count');
+  if (terms.length) {
+    if (roomIndex.previousElementSibling !== afterResults) afterResults.after(roomIndex);
+  } else if (roomIndex.nextElementSibling !== beforeResults) {
+    beforeResults.before(roomIndex);
+  }
   const matches = searchable.map(entry => ({...entry,score:relevance(entry,terms,normalized(value))}))
     .filter(entry => entry.score >= 0).sort((a,b) => b.score-a.score);
   text('results-count',terms.length ? '找到 ' + matches.length + ' 条记录' : '全部记录 · ' + matches.length + ' 件或分组');
@@ -1642,7 +1647,7 @@ function renderHash(focus = false) {
     renderRoute(item);
     const shelfLink = get('route-shelf');
     shelfLink.href = '#shelf/' + encodeURIComponent(item.location);
-    shelfLink.hidden = !wholeHome;
+    shelfLink.hidden = false;
   } else {
     active = null;
   }
