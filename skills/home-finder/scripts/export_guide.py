@@ -455,7 +455,7 @@ def export(args: argparse.Namespace) -> int:
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--catalog", required=True, help="catalog JSON file")
+    parser.add_argument("--catalog", required=True, help="path to 家庭物品档案.json")
     parser.add_argument("--template", required=True, help="HTML template with the two data placeholders")
     parser.add_argument("--out", required=True, help="HTML output path")
     parser.add_argument("--room", help="include only items whose first location path segment matches this name")

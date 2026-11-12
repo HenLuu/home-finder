@@ -1387,18 +1387,20 @@ document.querySelector('.brand-context').textContent = scope + '实拍导览';
 
 const kindLabels = {visual:'实拍',spoken:'旁白定位','visual+spoken':'实拍与旁白',user_report:'口述位置'};
 const colors = {
-  '绿色': /绿色|深绿|浅绿/u,
-  '蓝色': /蓝色|深蓝|浅蓝/u,
-  '红色': /红色|深红|浅红/u,
-  '白色': /白色|乳白|米白/u,
-  '黑色': /黑色|灰黑/u,
-  '黄色': /黄色|深黄|浅黄/u,
-  '橙色': /橙色|深橙|浅橙/u,
+  '绿色': /绿色|深绿|浅绿|绿盖|绿盒|绿叶|青椒/u,
+  '蓝色': /蓝色|深蓝|浅蓝|蓝盖|蓝盒/u,
+  '红色': /红色|深红|浅红|红盖|红盒|红碗/u,
+  '白色': /白色|乳白|米白|白盖|白头/u,
+  '黑色': /黑色|灰黑|黑盖|黑碗/u,
+  '黄色': /黄色|深黄|浅黄|黄盖/u,
+  '橙色': /橙色|深橙|浅橙|橙盖|橙白/u,
 };
+const seasoning = /沙茶|芥末|蚝油|咖喱|桂皮|花椒|香叶|蒜头酥|芝麻酱|豆腐乳|胡椒|食盐|酱油|食醋|调料|调味/u;
 const normalized = value => value.normalize('NFKC').trim().toLowerCase().replace(/\s+/gu,' ');
 function featureTags(item) {
   const names = [item.name,...item.aliases,item.detail].join(' ');
   const tags = Object.entries(colors).filter(([,pattern]) => pattern.test(names)).map(([name]) => name);
+  if (seasoning.test([item.name,...item.aliases].join(' '))) tags.push('调料');
   return [...new Set(tags)];
 }
 const displayName = item => item.name;
@@ -1509,9 +1511,72 @@ renderResults();
 function guideFor(item) {
   const recipe = legacy.get(item.id);
   if (recipe) {
-    return {...recipe, name:item.aliases.includes(recipe.name) ? recipe.name : displayName(item), note:item.note, steps:recipe.steps.map((step,i) => ({
-      ...step, evidenceLabel:step.evidenceLabel || (i===0 ? '柜体外观' : i===recipe.steps.length-1 ? '物品近照' : '打开后'),
-    }))};
+    const useText = (value, fallback) => typeof value === 'string' && value.trim() ? value : fallback;
+    const name = item.aliases.includes(recipe.name) ? recipe.name : displayName(item);
+    const target = useText(
+      recipe.target,
+      item.path.slice(wholeHome ? 0 : 1).join(' › ') || item.path.join(' › ') || name,
+    );
+    return {
+      ...recipe,
+      name,
+      target,
+      note:item.note,
+      steps:recipe.steps.map((step,i) => {
+        const first = i === 0;
+        const last = i === recipe.steps.length - 1;
+        const itemEvidenceIsVisual = item.kind === 'visual' || item.kind === 'visual+spoken';
+        const itemEvidenceIsSpoken = item.kind === 'spoken';
+        const photoLabel = first
+          ? item.locationPhotos.find(photo => photo.at === step.at)?.label
+          : last
+            ? item.itemPhotos.find(photo => photo.at === step.at)?.label
+            : '';
+        const time = step.at ? `，原片时间 ${step.at}` : '';
+        return {
+          ...step,
+          label:useText(
+            step.label,
+            first ? '位置参照' : last ? itemEvidenceIsVisual ? '物品实拍' : '查看记录' : '路线照片',
+          ),
+          title:useText(
+            step.title,
+            first ? '确认收纳位置' : last
+              ? itemEvidenceIsVisual ? '核对物品外观' : itemEvidenceIsSpoken ? '查看旁白记录' : '查看口述位置'
+              : `继续查看第 ${i + 1} 步`,
+          ),
+          instruction:useText(
+            step.instruction,
+            first
+              ? `按当前路径“${target}”确认收纳位置，再查看照片中的参照。`
+              : last
+                ? itemEvidenceIsVisual
+                  ? `查看${name}的物品实拍，核对身份与外观。`
+                  : itemEvidenceIsSpoken
+                    ? `结合旁白记录确认${name}在“${target}”的已记录位置；照片只作收纳范围参照。`
+                    : `查看${name}的口述位置记录，按“${target}”核对收纳范围。`
+                : '继续查看已保存的路线照片，不推定照片未标明的具体位置。',
+          ),
+          action:useText(step.action, last ? itemEvidenceIsVisual ? '查看证据' : '查看记录' : '下一步'),
+          evidenceLabel:useText(
+            step.evidenceLabel,
+            first ? '位置参照' : last ? itemEvidenceIsVisual ? '物品实拍' : '位置参照' : '实拍步骤',
+          ),
+          alt:useText(
+            step.alt,
+            photoLabel || (first
+              ? `位置参照照片${time}`
+              : last
+                ? itemEvidenceIsVisual
+                  ? `${name}的物品实拍${time}`
+                  : itemEvidenceIsSpoken
+                    ? `${name}的旁白记录${time}`
+                    : `${name}的口述位置记录${time}`
+                : `路线实拍第 ${i + 1} 步${time}`),
+          ),
+        };
+      }),
+    };
   }
   const steps = [];
   const stepsText = item.steps.length ? item.steps : ['到达 ' + item.path.join(' › ') + '。'];
